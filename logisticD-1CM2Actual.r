@@ -1,5 +1,6 @@
 library(lattice)
-eq<-function(x){0.987/(1+exp(-8.7*(x-0.424)))}
+library(plotrix)
+eq<-function(x){0.99/(1+exp(-8.98*(x-0.45)))}
 x<-seq(0,1,0.0001)
 #I
 Y<-c(0.020408163,
@@ -53,9 +54,37 @@ SY<-c(0.000327333,
       0.243347111,
       0.249539556,
       0.254611778)
+#Interval confidence - Random Case
+CI<-c(0.000146915,
+      0.000407585,
+      0.000705134,
+      0.000974329,
+      0.001297481,
+      0.001312647,
+      0.002149757,
+      0.001814758,
+      0.002395262,
+      0.002938198,
+      0.003160954,
+      0.003638972,
+      0.003839553,
+      0.003920849,
+      0.004583141,
+      0.004442004,
+      0.005341654,
+      0.0054719,
+      0.005594707,
+      0.005590482,
+      0.006152306,
+      0.006558101,
+      0.006132957,
+      0.006542141,
+      0.007531946)
 #Normalize SY
 NSY <- SY / 0.254611778
+NCI <- CI / 0.254611798
 
+#Do nothing rule
 Empates = c(0.001026327,
             0.004011283,
             0.010795635,
@@ -81,20 +110,20 @@ Empates = c(0.001026327,
             0.976959291,
             0.978312321,
             1)
-N#axis(1,at=x,labels=x,las=2,tck=0.02)
+#axis(1,at=x,labels=x,las=2,tck=0.02)
 #mtext(side=1,text="X axis",line=1.5)
-par(cex=2.5)
-plot(x,eq(x),type="l",lwd=2.5,ylim=c(0.03,1.0),ylab='',xlab='',tck=0.05)
+par(cex=1.5)
+plotCI(Y,Empates,NCI,lwd=2.5,col="dodger blue",xlim=c(0.01,1.0),ylim=c(0.01,1.0),ylab='',xlab='')
+par(new = TRUE)
+plot(x,eq(x),type="l",lwd=2.5,xlim=c(0.01,1.0),ylim=c(0.01,1.0),ylab='',xlab='',tck=0.05)
 par(new = TRUE,lwd=3,cex.sub=10)
-plot(Y,Empates,type="o",pch=1,lwd=2.5,cex=1.5,col="dodger blue",bg="dodger blue",ylim=c(0.003,1.0),axes=FALSE,ylab='',xlab='')
-
-#plot(Y,SY1,type="p",ylim=c(0.0003,0.5),axes=FALSE,ylab='',xlab='')
-#par(new = TRUE)
-
-legend(0.5,0.2, legend=c("Statistical", "Analytical"),col=c("black", "black"), lty=1:2, cex=0.8)
+plot(Y,Empates,type="o",pch=1,lwd=2,cex=1.5,col="dodger blue",bg="dodger blue",ylim=c(0.003,1.0),axes=FALSE,ylab='',xlab='')
+par(new = TRUE)
 
 
 #Determination Coefficient between Y and SY
 expf = lm(SY ~ eq(Y))
 summary(expf)$r.squared
+
+
 
