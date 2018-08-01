@@ -2,10 +2,10 @@
 
 ;GLOBALES VARIABLES
 ;------------------
-globals[contador contadorAct contadorActNull i j tduni1 tduni2 tduni3 tduni4 blacks a m n
+globals[contador contadorAct contadorActNull i j k tduni1 tduni2 tduni3 tduni4 blacks a m n
          patche1 patche2 patche3 patche4 propini propfin propiniab propt0
          xi yj personas P1 P2 negro P3 blanco Caux p sum-color1 sum-color2 sum-color3
-         sum-color4 col npixel z colorempate2rm colorempate1rm
+         sum-color4 col npixel z colorempate2rm colorempate1rm vecinos
          t0party_1 t0party_2 t0party_3 t0party_4 t0party_5
          maximum contempate-mr contempate-ab rcolor rpartido
          c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 partidomenor
@@ -220,10 +220,11 @@ repeat 1400 ;Stripe
     ;Choose a patch with coordinates (xi,yj) then save it in personas list
     set personas sentence personas item z npixel
     ;To determinate how is theh neighbourhood of patch (xi,yj) in termos of number of nodes per party
-    ask item z npixel [set sum-color1 sum ([influencia] of (neighbors3 pxcor pycor) with [pcolor = 2])]   ;Party 1
-    ask item z npixel [set sum-color2 sum ([influencia] of (neighbors3 pxcor pycor) with [pcolor = 8])]   ;Party 2
-    ask item z npixel [set sum-color3 sum ([influencia] of (neighbors3 pxcor pycor) with [pcolor = white])]  ;Party 3
-    set sum-color4 4 - sum-color1 - sum-color2 - sum-color3 ;Party 4, the null node arround patch xi yj, they has influencia = 0
+    set vecinos neighbors2 pxcor pycor
+    ask item z npixel [set sum-color1 sum ([influencia] of vecinos with [pcolor = 2])]   ;Party 1
+    ask item z npixel [set sum-color2 sum ([influencia] of vecinos with [pcolor = 8])]   ;Party 2
+    ask item z npixel [set sum-color3 sum ([influencia] of vecinos with [pcolor = white])]  ;Party 3
+    set sum-color4 2 - sum-color1 - sum-color2 - sum-color3 ;Party 4, the null node arround patch xi yj, they has influencia = 0
 
     ;To count number of inspections we made
     set contadorAct contadorAct  + 1
@@ -260,7 +261,10 @@ repeat 1400 ;Stripe
     ;To enter here, we considering a 4-neighbourhood AB, C excluding C's or only A's and B's
     ;To enter and inspect a group G: we consider a 4-neighbourhood with AB, C, 0 excluding C's or only A's and B's or only 0's
     ;The logic negation is sum-color3=0 or (sum-color1=0 and sum-color2=0) which means only C's and only A's and B's then is correct!
-    if(sum-color3 > 0 and (sum-color1 > 0 or sum-color2 > 0) or (sum-color3 > 0 and sum-color4 > 0) or ((sum-color1 > 0 or sum-color2 > 0) and sum-color4 > 0))
+
+    ;if((sum-color3 > 0 and sum-color1 > 0) or (sum-color3 > 0 and sum-color2 > 0) or (sum-color3 > 0 and sum-color1 > 0 and sum-color2 > 0) or (sum-color3 > 0 and sum-color4 > 0) or (sum-color1 > 0 and sum-color4 > 0) or
+    ;  (sum-color2 > 0 and sum-color4 > 0))
+    if((not(sum-color1 + sum-color2 = 3)) and (not(sum-color3 = 3)))
     [
 
     ;Mayority rule for AB VS C and 0
@@ -271,12 +275,12 @@ repeat 1400 ;Stripe
             if sum-color1  > sum-color2 ; A's > B's
             [
             ask item z npixel [set pcolor 2 set partido 5 set influencia 1]
-            ask neighbors4 [set pcolor 2 set partido 5 set influencia 1]
+            ask neighbors2 pxcor pycor [set pcolor 2 set partido 5 set influencia 1]
             ]
             if sum-color1  < sum-color2 ; A's < B's
             [
             ask item z npixel [set pcolor 8 set partido 5 set influencia 1]
-            ask neighbors4 [set pcolor 8 set partido 5 set influencia 1]
+            ask neighbors2 pxcor pycor [set pcolor 8 set partido 5 set influencia 1]
             ]
             if sum-color1  = sum-color2 ; if A's = B's then do random selection between {A,B}
             [
@@ -286,7 +290,7 @@ repeat 1400 ;Stripe
              [set colorempate2rm 8] ;
 
              ask item z npixel [set pcolor colorempate2rm set partido 5 set influencia 1]
-             ask neighbors4 [set pcolor colorempate2rm set partido 5 set influencia 1]
+             ask neighbors2 pxcor pycor [set pcolor colorempate2rm set partido 5 set influencia 1]
              ;Just delete random rule for the variation
              set contempate-ab contempate-ab + 1
              ;Count cases with 0's here
@@ -306,7 +310,7 @@ repeat 1400 ;Stripe
     if (sum-color3 > sum-color1 + sum-color2)
     [
          ask item z npixel [set pcolor white  set partido 3 set influencia 1]
-         ask neighbors4 [set pcolor white  set partido 3 set influencia 1]
+         ask neighbors2 pxcor pycor [set pcolor white  set partido 3 set influencia 1]
     ]
 
     ;The system has 0's and MR no decides
@@ -437,11 +441,21 @@ end
 
 ; REPORTERS
 
-to-report neighbors3 [px py]
-  report (patch-set patch (px - 1) py patch (px + 1) py)
+to-report neighbors2 [px py]
+  ;report (patch-set patch (px - 1) py patch (px + 1) py)
+
+   set i random 4
+   set j one-of neighbors4
+   set k one-of neighbors4
+   set A (patch-set j)
+  while [member? k A]
+    [ set k one-of neighbors4 ]
+   report (patch-set j k)
 end
 
-
+to-report neighbors2r [px py]
+  report (patch-set patch (px - 1) py patch px (py + 1))
+end
 
 ; proportional report colors 2, 8
 to-report proportional
@@ -524,13 +538,13 @@ to SetUpDraw
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-231
-10
-314
-94
+329
+91
+682
+445
 -1
 -1
-1.0
+6.9
 1
 10
 1
@@ -541,9 +555,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-74
+49
 0
-74
+49
 0
 0
 1
@@ -593,7 +607,7 @@ persons_party1
 persons_party1
 0
 (netorder + 1)*(netorder + 1)
-1406.0
+625.0
 1
 1
 NIL
@@ -608,7 +622,7 @@ persons_party2
 persons_party2
 0
 (netorder + 1)*(netorder + 1)
-1406.0
+625.0
 1
 1
 NIL
@@ -620,7 +634,7 @@ INPUTBOX
 377
 627
 tparty_1
-1669.0
+917.0
 1
 0
 Number
@@ -631,7 +645,7 @@ INPUTBOX
 544
 627
 tparty_2
-3956.0
+758.0
 1
 0
 Number
@@ -642,7 +656,7 @@ INPUTBOX
 711
 628
 tparty_3
-0.0
+825.0
 1
 0
 Number
@@ -656,7 +670,7 @@ persons_party3
 persons_party3
 0
 (netorder + 1)*(netorder + 1)
-2812.0
+1250.0
 1
 1
 NIL
@@ -679,7 +693,7 @@ INPUTBOX
 711
 697
 nnodos
-5625.0
+2500.0
 1
 0
 Number
@@ -690,7 +704,7 @@ INPUTBOX
 545
 696
 tparty_5
-5625.0
+1675.0
 1
 0
 Number
@@ -759,7 +773,7 @@ totaladistribuir
 totaladistribuir
 0
 (netorder + 1) * (netorder + 1)
-5625.0
+2500.0
 1
 1
 NIL
@@ -967,7 +981,7 @@ CHOOSER
 netorder
 netorder
 49 74 99 114 149 199 249 499 999
-1
+0
 
 SWITCH
 1169
@@ -1087,7 +1101,7 @@ persons_party4
 persons_party4
 0
 (netorder + 1) * (netorder + 1)
-1.0
+0.0
 1
 1
 NIL
@@ -1630,7 +1644,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.2
+NetLogo 6.0.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
