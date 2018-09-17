@@ -112,18 +112,19 @@ Empates = c(0.001026327,
             1)
 #axis(1,at=x,labels=x,las=2,tck=0.02)
 #mtext(side=1,text="X axis",line=1.5)
-par(cex=1.5)
-plotCI(Y,Empates,NCI,lwd=2.5,col="dodger blue",xlim=c(0.01,1.0),ylim=c(0.01,1.0),ylab='',xlab='')
-par(new = TRUE)
+#xtick<-seq(001, 1, by=0.01) #To axe marks
+par(cex=1.5,cex.axis=1.0)
+axis(1, at = seq(0.1, 1.0, by = 0.1), las=1)
 plot(x,eq(x),type="l",lwd=2.5,xlim=c(0.01,1.0),ylim=c(0.01,1.0),ylab='',xlab='',tck=0.05)
+#axis(1, at = seq(0.1, 1.0, by = 0.1), las=1)
+par(new = TRUE)
+plotCI(Y,Empates,NCI,lwd=2.5,col="dodger blue",xlim=c(0.01,1.0),ylim=c(0.01,1.0),ylab='',xlab='')
+
 par(new = TRUE,lwd=3,cex.sub=10)
-plot(Y,Empates,type="o",pch=1,lwd=2,cex=1.5,col="dodger blue",bg="dodger blue",ylim=c(0.003,1.0),axes=FALSE,ylab='',xlab='')
+plot(Y,NSY,type="o",pch=1,lwd=2,cex=1.5,col="dodger blue",bg="dodger blue",ylim=c(0.003,1.0),axes=FALSE,ylab='',xlab='')
 par(new = TRUE)
 
 
 #Determination Coefficient between Y and SY
 expf = lm(SY ~ eq(Y))
 summary(expf)$r.squared
-
-
-
