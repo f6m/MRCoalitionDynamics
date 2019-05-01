@@ -1,24 +1,19 @@
-;;By m6f, any comment please write me at hellypoch@gmail.com
+;;By m6f, any comment please send me a message at hellypoch@gmail.com
 
-;VARIABLES GLOBALES
-;------------------
-globals[contador contadorAct contadorActNull i j tduni1 tduni2 tduni3 tduni4 blacks a m n
-         patche1 patche2 patche3 patche4 propini propfin propiniab propt0
-         xi yj personas P1 P2 negro P3 blanco Caux p sum-color1 sum-color2 sum-color3
-         sum-color4 col npixel z pc nlist nlist1 colorempate2rm
-         t0party_1 t0party_2 t0party_3 t0party_4 t0party_5
-         maximum contempate-mr contempate-ab rcolor rpartido
-         c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12 partidomenor
-         menorav mayorav ]
-
+;Global Variables
+globals[contadorAct contadorActNull i j tduni1 tduni2 tduni3 tduni4 blacks
+        N propini propfin propiniab propt0  personas Caux sum-color1 sum-color2
+        sum-color3 sum-color4 npixel z pc nlist nlist1 colorempate2rm
+        t0party_1 t0party_2 t0party_3 t0party_4 t0party_5
+        contempate-mr contempate-ab menorav mayorav
+        c1 c2 c3 c4 c5 c6 c7 c8 c9 c10 c11 c12
+        ]
 
 ;PATCH VARIABLES
 patches-own [partido influencia]
 ;---------------
 
-;SETUP PROCEDURE. System initializatioin, by distributing opinions A,B,C,0
-;Opinions A, B, C, 0 are drawed with black respectively.
-;------------------------------------------------------------------------
+;SETUP PROCEDURE. System initialization distributes opinions A,B,C,0
 
 to setup
  ;Resize the work according to netorder value
@@ -87,9 +82,6 @@ set N nnodos
     set tduni3 []
     set tduni4 []
 
-;If it is required to draw districts lines we draw them
-    if districtdraw = true [ draw_district ]
-
  ;To distribute A nodes
  repeat persons_party1 ;Repeat participante1 times
  [
@@ -116,11 +108,7 @@ set N nnodos
  ifelse persons_party3 = nnodos / 2
  [
    ask patches with [pcolor = black] [ set pcolor white set partido 3 set influencia 1 ]
-   ;set N 0
-   ;set i pxcor
-   ;set j pycor
-   ;set tduni3 sentence tduni3 patch i j ]
- ]
+  ]
  [
  ; to enter here persons_party3 is less (or more) than #V(R)
  repeat persons_party3
@@ -151,21 +139,12 @@ set N nnodos
  ]
  set blacks count patches with [pcolor = black]
 
-
  ;Contamos los individuos de cada partido
  set tparty_1 count patches with [partido = 1]
  set tparty_2 count patches with [partido = 2]
  set tparty_3 count patches with [partido = 3]
  set tparty_4 count patches with [partido = 4]
  set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
-
- ;Before to begin with dynamics, we set up some variables
- ;Following lists are needed by plot procedure
- set P1 []
- set P2 []
- set P3 []
- set negro []
- set blanco []
 
  ;Variable to count draws under main MR
  set contempate-mr 0
@@ -196,9 +175,8 @@ set N nnodos
 end
 
 
-;INICIO PROCEDURE. Apply repetition scheme and inspection of patches
+;INICIO PROCEDURE. Apply Dorsenfeld shuffle algorithm scheme to sample the patches
 ;-------------------------------------------------------------------
-
 to inicio
 
 set pc 2 ;Select minor party color an inicial color from coalition
@@ -285,7 +263,6 @@ repeat 1600 ;Stripe
            ;if(length nlist = 1)[foreach nlist [ask ? [set pcolor one-of nlist1]]] ;[set pcolor pc if-else(pc = 2)[set pc 8][set pc 2]]]]
            ;Cases with 0's here
 
-
            if sum-color1  = sum-color2 ; if A's = B's then do random selection between {A,B}
             [
              ;Empate coalicion bajo regla de mayoria
@@ -314,8 +291,6 @@ repeat 1600 ;Stripe
            set partido 5 set influencia 1
            ask neighbors4 [set partido 5 set influencia 1]
             ]
-
-
     ] ;END coalition AB wins to C in the 4-neighbourhood with central A
 
       ;If C wins
@@ -363,62 +338,6 @@ repeat 1600 ;Stripe
    set tparty_4 count patches with [pcolor = black]
    set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
 
-   ;To plotting...
-     set a ((count patches with [pcolor = 2]) + (count patches with [pcolor = 8]) + (count patches with [pcolor = white ])
-       + (count patches with [pcolor = 4]) + (count patches with [partido = 5]))
-
-     ;set-current-plot "grafic"
-
-     ;set-current-plot-pen "party_1"
-     set P1 sentence P1 (count(patches with [pcolor = 2]) / a)
-     ;plot count ( patches with [pcolor = 2] ) / a
-     ;set-plot-pen-color 2
-
-     ;set-current-plot-pen "party_2"
-     set P2 sentence P2 (count(patches with [pcolor = 8]) / a)
-     ;plot count (patches with [pcolor = 8]) / a
-     ;set-plot-pen-color 8
-
-     ;set-current-plot-pen "party_3"
-     set P3 sentence P3 (count(patches with [pcolor = white ]) / a)
-     ;plot count (patches with [pcolor = white ]) / a
-     ;set-plot-pen-color white
-
-     ;set-current-plot-pen "party_4"
-     set negro sentence negro (count(patches with [partido = 4]) / a)
-     ;plot count (patches with [partido = 4]) / a
-     ;set-plot-pen-color black
-
-
-     ;set-current-plot-pen "party_5"
-     set blanco sentence blanco (count(patches with [partido = 5]) / a)
-     ;plot count (patches with [partido = 5]) / a
-     ;set-plot-pen-color black
-
-
-     ;When 0's dissapear
-     if ((tparty_4 = 0) and (blacks > 0))
-     [
-       ;We count party cardinallities at T_0, time when 0's dissapear
-       set t0party_1 tparty_1
-       set t0party_2 tparty_2
-       set t0party_3 tparty_3
-       set t0party_4 tparty_4
-       set t0party_5 tparty_5
-       set blacks 0
-
-       ;To stablish final proportion
-     if ((menorav = 2) and (t0party_2 != 0)) ;party A is the minimum size party
-     [
-     set propt0 t0party_1 / t0party_2
-     ]
-
-     if ((menorav = 8) and (t0party_1 != 0)) ;party B us the minimum size party
-     [
-     set propt0 t0party_2 / t0party_1
-     ]
-      ] ; end 0's dissapear
-
      ;To stablish final proportion
      if ((menorav = 2) and (tparty_2 != 0)) ;party A is the minimum size party
      [
@@ -430,8 +349,7 @@ repeat 1600 ;Stripe
      set propfin tparty_2 / tparty_1
      ]
 
-
-   ] ;END repeat 600
+   ] ;END repeat 1400
 
 stop
 
@@ -455,70 +373,6 @@ to-report proportional
 end
 
 
-;Procedure to draw lines into network for districts to draw_district square
-;--------------------------------------------------------
-to draw_district
-set contador  ceiling ((netorder + 1) / 10) ;50 / 10, 75 / 10, 100 / 10, 125 / 10, 150 / 10
-   set i 0
-   set j 0
-
-   repeat contador
-   [ crt 1 [ ;creates one turtle specifying coordinates (x,y)
-      setxy i * 10 j * 10 ;(0,0),(10,10),...,(100,100)
-      set heading 0 ;angle 0 and 360
-      set color green ;color
-      set shape "line" ;shape
-      set size (world-height + 50) ;size
-      stamp ;staping the shape in the world
-      rt 90 ;rotate 90 degrees
-      set size (world-width + 50)
-      stamp
-      set i i + 1
-      set j j + 1
-    ]
-  ]
-
-end
-
-;Procedimiento que dibuja una situacion de empate.
-;-------------------------------------------------------------
-to SetUpDraw
-
-      clear-all
-      ask patches [set partido 4 set influencia 0 set pcolor black]
-
-      ;set i random 50
-      ;set j random 50
-
-
-      ;vamos a ponere una situacion de empate AB000
-      ;set patche1 patch i j
-      ;ask patche1 [set pcolor 2 set partido 1 set influencia 1]
-
-      ;set patche2 patch i (j + 1)
-      ;ask patche2 [set pcolor 8 set partido 2 set influencia 1]
-
-
-      ;vamos a poner una situacion de empate AABBC
-      set m random 50
-      set n random 50
-
-      set patche1 patch m n
-      ask patche1 [set pcolor 2 set partido 1 set influencia 1]
-      set patche2 patch (m - 1) n
-      ask patche2 [set pcolor 2 set partido 1 set influencia 1]
-
-      set patche3 patch m (n + 1)
-      ask patche3 [set pcolor 8 set partido 2 set influencia 1]
-      set patche4 patch (m + 1) n
-      ask patche4 [set pcolor 8 set partido 2 set influencia 1]
-
-      set patche4 patch m (n - 1)
-      ask patche4 [set pcolor white  set partido 3 set influencia 1]
-
-      ;inicio
-
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
 231
@@ -807,23 +661,6 @@ porcentC
 NIL
 HORIZONTAL
 
-BUTTON
-800
-64
-927
-97
-NIL
-SetUpDraw\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 MONITOR
 25
 435
@@ -966,17 +803,6 @@ netorder
 49 74 99 114 149 199 499 999
 5
 
-SWITCH
-1189
-33
-1323
-66
-districtdraw
-districtdraw
-1
-1
--1000
-
 MONITOR
 26
 10
@@ -1000,56 +826,12 @@ c6
 16
 
 MONITOR
-1011
-635
-1061
-688
-To
-contadorActNull / nnodos
-17
-1
-13
-
-MONITOR
 880
 579
 961
 624
 #Empate AB
 contempate-ab
-17
-1
-11
-
-MONITOR
-789
-634
-859
-679
-#A at To
-t0party_1
-17
-1
-11
-
-MONITOR
-868
-634
-929
-679
-#B at To
-t0party_2
-17
-1
-11
-
-MONITOR
-938
-635
-1003
-680
-# C at To
-t0party_3
 17
 1
 11
@@ -1089,17 +871,6 @@ persons_party4
 1
 NIL
 HORIZONTAL
-
-MONITOR
-1072
-637
-1230
-682
-Actualizaciones con Indecisos
-contadorActNull
-17
-1
-11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1627,7 +1398,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.1
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
