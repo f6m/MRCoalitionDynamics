@@ -1,4 +1,4 @@
-;;By m6f, any comment please write me at hellypoch@gmail.com
+;;By m6f, any comment please send me a message at hellypoch@gmail.com
 
 ;Global Variables
 globals[contadorAct contadorActNull i j tduni1 tduni2 tduni3 tduni4 blacks
@@ -109,11 +109,7 @@ set N nnodos
  ifelse persons_party3 = nnodos / 2
  [
    ask patches with [pcolor = black] [ set pcolor white set partido 3 set influencia 1 ]
-   ;set N 0
-   ;set i pxcor
-   ;set j pycor
-   ;set tduni3 sentence tduni3 patch i j ]
- ]
+  ]
  [
  ; to enter here persons_party3 is less (or more) than #V(R)
  repeat persons_party3
@@ -181,9 +177,8 @@ set N nnodos
 end
 
 
-;INICIO PROCEDURE. Apply repetition scheme and inspection of patches
+;INICIO PROCEDURE. Apply Dorsenfeld shuffle algorithm scheme to sample the patches
 ;-------------------------------------------------------------------
-
 to inicio
 
 set pc 2 ;Select minor party color an inicial color from coalition
@@ -270,7 +265,6 @@ repeat 1600 ;Stripe
            ;if(length nlist = 1)[foreach nlist [ask ? [set pcolor one-of nlist1]]] ;[set pcolor pc if-else(pc = 2)[set pc 8][set pc 2]]]]
            ;Cases with 0's here
 
-
            if sum-color1  = sum-color2 ; if A's = B's then do random selection between {A,B}
             [
              ;Coalition tie  under MR -- Do nothig rule -- only counts.
@@ -295,7 +289,6 @@ repeat 1600 ;Stripe
            set partido 5 set influencia 1
            ask neighbors4 [set partido 5 set influencia 1]
             ]
-
 
     ] ;END coalition AB wins to C in the 4-neighbourhood with central A
 
@@ -344,29 +337,6 @@ repeat 1600 ;Stripe
    set tparty_4 count patches with [pcolor = black]
    set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
 
-   ;When 0's dissapear
-     if ((tparty_4 = 0) and (blacks > 0))
-     [
-       ;We count party cardinallities at T_0, time when 0's dissapear
-       set t0party_1 tparty_1
-       set t0party_2 tparty_2
-       set t0party_3 tparty_3
-       set t0party_4 tparty_4
-       set t0party_5 tparty_5
-       set blacks 0
-
-     ;To stablish final proportion
-     if ((menorav = 2) and (t0party_2 != 0)) ;party A is the minimum size party
-     [
-     set propt0 t0party_1 / t0party_2
-     ]
-
-     if ((menorav = 8) and (t0party_1 != 0)) ;party B us the minimum size party
-     [
-     set propt0 t0party_2 / t0party_1
-     ]
-     ] ; end 0's dissapear
-
      ;To stablish final proportion
      if ((menorav = 2) and (tparty_2 != 0)) ;party A is the minimum size party
      [
@@ -401,7 +371,6 @@ to-report proportional
   if menorav = 8 and h > propiniab
    [report 2]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 231
@@ -500,7 +469,7 @@ INPUTBOX
 445
 638
 tparty_1
-400.0
+406.0
 1
 0
 Number
@@ -511,7 +480,7 @@ INPUTBOX
 612
 638
 tparty_2
-19600.0
+18893.0
 1
 0
 Number
@@ -522,7 +491,7 @@ INPUTBOX
 779
 639
 tparty_3
-20000.0
+20701.0
 1
 0
 Number
@@ -570,7 +539,7 @@ INPUTBOX
 613
 707
 tparty_5
-20000.0
+19299.0
 1
 0
 Number
@@ -855,56 +824,12 @@ c6
 16
 
 MONITOR
-1011
-635
-1061
-688
-To
-contadorActNull / nnodos
-17
-1
-13
-
-MONITOR
 880
 579
 961
 624
 #Empate AB
 contempate-ab
-17
-1
-11
-
-MONITOR
-789
-634
-859
-679
-#A at To
-t0party_1
-17
-1
-11
-
-MONITOR
-868
-634
-929
-679
-#B at To
-t0party_2
-17
-1
-11
-
-MONITOR
-938
-635
-1003
-680
-# C at To
-t0party_3
 17
 1
 11
@@ -944,17 +869,6 @@ persons_party4
 1
 NIL
 HORIZONTAL
-
-MONITOR
-1072
-637
-1230
-682
-Actualizaciones con Indecisos
-contadorActNull
-17
-1
-11
 
 @#$#@#$#@
 ## WHAT IS IT?
