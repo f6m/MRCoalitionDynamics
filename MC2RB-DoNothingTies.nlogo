@@ -15,7 +15,7 @@ patches-own [partido influencia]
 ;---------------
 
 ;SETUP PROCEDURE. System initialization distributes opinions A,B,C,0
-
+;DORNSTENFELD SHUFFLE ALGORITH!!!!
 to setup
  ;Resize the work according to netorder value
  resize-world 0 netorder 0 netorder
