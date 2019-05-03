@@ -186,7 +186,7 @@ set pc 2 ;Select minor party color an inicial color from coalition
 repeat 1600 ;Stripe
 [
    ;Condicion para terminar el la dinámica del modelo, escencialmente es que se llege al concenso o que se efectuen todos los 600 ciclos
-  if (tparty_1 = nnodos) or (tparty_2 = nnodos) or (tparty_3 = nnodos) or (tparty_4 = nnodos) or (tparty_5 = nnodos) [stop]
+  if (tparty_1 = nnodos) or (tparty_2 = nnodos) or (tparty_3 = nnodos) or (tparty_5 = nnodos) [stop]
 
   set N nnodos
   set npixel Caux ; Return npixel to the previos before modified in setup procedure.
@@ -208,21 +208,18 @@ repeat 1600 ;Stripe
     set sum-color1 sum ([influencia] of neighbors4 with [pcolor = 2])   ;Party 1
     set sum-color2 sum ([influencia] of neighbors4 with [pcolor = 8])  ;Party 2
     set sum-color3 sum ([influencia] of neighbors4 with [pcolor = white])  ;Party 3
-    set sum-color4 4 - (sum-color1 + sum-color2 + sum-color3) ;Party 4, the null nodes arround patch xi yj with influencia = 0
+
+        if (sum-color1 + sum-color2 + sum-color3 != 4)
+        [
+           stop
+        ]
 
     set nlist (list neighbors4 with [pcolor = white or pcolor = black]) ;Select those C,0 nodes in G and change to coalition equally
     ask neighbors4 with [pcolor != white and pcolor != black][set nlist1 sentence nlist1 pcolor]
     ;To count number of inspections we made
     set contadorAct contadorAct  + 1
 
-    ;To know the number of cycles when null nodes desapair
-    if tparty_4 > 0
-      [
-        set contadorActNull contadorActNull + 1
-      ]
-
     ;Party 1 = A color soft black code 2, party 2 = B color gray code 8, party 3 = C color white code white, null = 0 color black code 0
-
     ;To add central node and take it in account
     if (pcolor = 2)
     [
@@ -240,15 +237,9 @@ repeat 1600 ;Stripe
     set nlist sentence nlist item z npixel
     ]
 
-    if (pcolor = black)
-    [
-    set sum-color4 sum-color4 + 1
-    set nlist sentence nlist item z npixel
-    ]
-
     ;To enter and inspect a group G: we consider a 4-neighbourhood with AB, C, 0 excluding C's or only A's and B's or only 0's
-    ;The logic negation is sum-color3=0 or (sum-color1=0 and sum-color2=0) which means only C's and only A's and B's then is correct!
-    if(sum-color3 > 0 and (sum-color1 > 0 or sum-color2 > 0) or (sum-color3 > 0 and sum-color4 > 0) or ((sum-color1 > 0 or sum-color2 > 0) and sum-color4 > 0))
+    ;The logic negation is sum-color3=0 or (sum-color1=0 and sum-color2=0) which means only C's and only A's and B's then it is correct!
+    if(sum-color3 > 0 and (sum-color1 > 0 or sum-color2 > 0))
     [
     ;if contadorAct != 0 [
     ;report item z npixel  ]
@@ -298,26 +289,7 @@ repeat 1600 ;Stripe
         ask item z npixel [set pcolor white  set partido 3 set influencia 1]
         ask neighbors4 [set pcolor white  set partido 3 set influencia 1]
       ]
-      ;The system has 0's and MR no decides
-      if (sum-color3 = sum-color1 + sum-color2)
-      [
-        ;Draw under mr
-        ;foreach nlist [ask ? [set pcolor one-of nlist1]]
-        ;Numerate
-        set contempate-mr contempate-mr + 1 ;count mr-draw
-        if(sum-color4 = 5) ;00000
-        [set c1 c1 + 1]
-        if(sum-color1 = 1 and sum-color3 = 1 and sum-color4 = 3) ;AC000
-        [set c2 c2 + 1]
-        if(sum-color2 = 1 and sum-color3 = 1 and sum-color4 = 3) ;BC000
-        [set c3 c3 + 1]
-        if(sum-color1 = 2 and sum-color3 = 2 and sum-color4 = 1) ;AACC0
-        [set c4 c4 + 1]
-        if(sum-color2 = 2 and sum-color3 = 2 and sum-color4 = 1) ;BBCC00
-        [set c5 c5 + 1]
-        if(sum-color1 = 1 and sum-color2 = 1 and sum-color3 = 2 and sum-color4 = 1) ;ABCC0
-        [set c6 c6 + 1]
-      ]
+
     ] ;End if, conditions to enter in 4-neighbourhood analysys
 
         if repeticion = false
@@ -334,7 +306,6 @@ repeat 1600 ;Stripe
    set tparty_1 count patches with [pcolor = 2]
    set tparty_2 count patches with [pcolor = 8]
    set tparty_3 count patches with [pcolor = white ]
-   set tparty_4 count patches with [pcolor = black]
    set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
 
      ;To stablish final proportion
@@ -375,11 +346,11 @@ end
 GRAPHICS-WINDOW
 231
 10
-439
-219
+739
+519
 -1
 -1
-1.0
+0.5
 1
 10
 1
@@ -390,9 +361,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-199
+999
 0
-199
+999
 0
 0
 1
@@ -442,7 +413,7 @@ persons_party1
 persons_party1
 0
 (netorder + 1)*(netorder + 1)
-400.0
+85000.0
 1
 1
 NIL
@@ -457,7 +428,7 @@ persons_party2
 persons_party2
 0
 (netorder + 1)*(netorder + 1)
-19600.0
+415000.0
 1
 1
 NIL
@@ -469,7 +440,7 @@ INPUTBOX
 445
 638
 tparty_1
-406.0
+85000.0
 1
 0
 Number
@@ -480,7 +451,7 @@ INPUTBOX
 612
 638
 tparty_2
-18893.0
+415000.0
 1
 0
 Number
@@ -491,7 +462,7 @@ INPUTBOX
 779
 639
 tparty_3
-20701.0
+500000.0
 1
 0
 Number
@@ -505,7 +476,7 @@ persons_party3
 persons_party3
 0
 (netorder + 1)*(netorder + 1)
-20000.0
+500000.0
 1
 1
 NIL
@@ -528,7 +499,7 @@ INPUTBOX
 779
 708
 nnodos
-40000.0
+1000000.0
 1
 0
 Number
@@ -539,7 +510,7 @@ INPUTBOX
 613
 707
 tparty_5
-19299.0
+500000.0
 1
 0
 Number
@@ -608,7 +579,7 @@ totaladistribuir
 totaladistribuir
 0
 (netorder + 1) * (netorder + 1)
-40000.0
+1000000.0
 1
 1
 NIL
@@ -623,7 +594,7 @@ porcentA
 porcentA
 0
 1
-0.01
+0.085
 0.001
 1
 NIL
@@ -638,7 +609,7 @@ porcentB
 porcentB
 0
 1
-0.49
+0.415
 0.001
 1
 NIL
@@ -798,8 +769,8 @@ CHOOSER
 78
 netorder
 netorder
-49 74 99 114 149 199 499 999
-5
+49 74 99 114 149 199 299 499 999
+8
 
 MONITOR
 26
