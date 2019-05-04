@@ -25,7 +25,6 @@ to setup
  set tparty_2 0
  set tparty_3 0
  set tparty_4 0
- set tparty_5 0
 
  ;porcentA, porcentB and porcentC sets percents for party, i.e., numbers in [0,1] s.t. porcentA + porcentB = 1 - pocentC and porcentC <= 1
  ifelse (porcentC <= 1)
@@ -69,10 +68,9 @@ to setup
     set j 0
    ]
 
-;Here npixel is an ordered list o patches pairs, length(npixel)=10000
+;Here npixel is an ordered list o patches pairs, length(npixel)=N
 set Caux npixel
 
-;10000 = N
 set N nnodos
 
 ;It is distributed patches according to persons_party1, persons_party2, and persons_party3
@@ -82,7 +80,7 @@ set N nnodos
     set tduni3 []
     set tduni4 []
 
- ;To distribute A nodes
+ ;To distribute randomly A nodes
  repeat persons_party1 ;Repeat participante1 times
  [
    set z random N     ; 0 <= z <= 9999
@@ -152,7 +150,6 @@ set N nnodos
 
  ;Variables para contar cada actualización realizada
  set contadorAct 0 ;Este contador nos permite contar el numero de pasos de actualizacion y se usa al dibujar la cuadricula
- set contadorActNull 0 ;Este contador nos permita contar el numero de ciclos antes de acabar con indecisos
 
  ;To know minimum and maximum size party and to fix initial proportion.
  ;I = Im / Ig
@@ -184,7 +181,7 @@ set pc 2 ;Select minor party color an inicial color from coalition
 repeat 1600 ;Stripe
 [
    ;Condicion para terminar el la dinámica del modelo, escencialmente es que se llege al concenso o que se efectuen todos los 600 ciclos
-  if (tparty_1 = nnodos) or (tparty_2 = nnodos) or (tparty_3 = nnodos) or (tparty_4 = nnodos) or (tparty_5 = nnodos) [stop]
+  if (tparty_1 = nnodos) or (tparty_2 = nnodos) or (tparty_3 = nnodos) or (tparty_5 = nnodos) [stop]
 
   set N nnodos
   set npixel Caux ; Return npixel to the previos before modified in setup procedure.
@@ -206,21 +203,18 @@ repeat 1600 ;Stripe
     set sum-color1 sum ([influencia] of neighbors4 with [pcolor = 2])   ;Party 1
     set sum-color2 sum ([influencia] of neighbors4 with [pcolor = 8])  ;Party 2
     set sum-color3 sum ([influencia] of neighbors4 with [pcolor = white])  ;Party 3
-    set sum-color4 4 - (sum-color1 + sum-color2 + sum-color3) ;Party 4, the null nodes arround patch xi yj with influencia = 0
+
+        if (sum-color1 + sum-color2 + sum-color3 != 4)
+        [
+           stop
+        ]
 
     set nlist (list neighbors4 with [pcolor = white or pcolor = black]) ;Select those C,0 nodes in G and change to coalition equally
     ask neighbors4 with [pcolor != white and pcolor != black][set nlist1 sentence nlist1 pcolor]
     ;To count number of inspections we made
     set contadorAct contadorAct  + 1
 
-    ;To know the number of cycles when null nodes desapair
-    if tparty_4 > 0
-      [
-        set contadorActNull contadorActNull + 1
-      ]
-
     ;Party 1 = A color soft black code 2, party 2 = B color gray code 8, party 3 = C color white code white, null = 0 color black code 0
-
     ;To add central node and take it in account
     if (pcolor = 2)
     [
@@ -238,15 +232,9 @@ repeat 1600 ;Stripe
     set nlist sentence nlist item z npixel
     ]
 
-    if (pcolor = black)
-    [
-    set sum-color4 sum-color4 + 1
-    set nlist sentence nlist item z npixel
-    ]
-
     ;To enter and inspect a group G: we consider a 4-neighbourhood with AB, C, 0 excluding C's or only A's and B's or only 0's
     ;The logic negation is sum-color3=0 or (sum-color1=0 and sum-color2=0) which means only C's and only A's and B's then is correct!
-    if(sum-color3 > 0 and (sum-color1 > 0 or sum-color2 > 0) or (sum-color3 > 0 and sum-color4 > 0) or ((sum-color1 > 0 or sum-color2 > 0) and sum-color4 > 0))
+    if(sum-color3 > 0 and (sum-color1 > 0 or sum-color2 > 0))
     [
     ;if contadorAct != 0 [
     ;report item z npixel  ]
@@ -299,27 +287,7 @@ repeat 1600 ;Stripe
         ask item z npixel [set pcolor white  set partido 3 set influencia 1]
         ask neighbors4 [set pcolor white  set partido 3 set influencia 1]
       ]
-      ;The system has 0's and MR no decides
-      if (sum-color3 = sum-color1 + sum-color2)
-      [
-        ;Draw under mr
-        ;foreach nlist [ask ? [set pcolor one-of nlist1]]
-        ;Numerate
-        set contempate-mr contempate-mr + 1 ;count mr-draw
-        if(sum-color4 = 5) ;00000
-        [set c1 c1 + 1]
-        if(sum-color1 = 1 and sum-color3 = 1 and sum-color4 = 3) ;AC000
-        [set c2 c2 + 1]
-        if(sum-color2 = 1 and sum-color3 = 1 and sum-color4 = 3) ;BC000
-        [set c3 c3 + 1]
-        if(sum-color1 = 2 and sum-color3 = 2 and sum-color4 = 1) ;AACC0
-        [set c4 c4 + 1]
-        if(sum-color2 = 2 and sum-color3 = 2 and sum-color4 = 1) ;BBCC00
-        [set c5 c5 + 1]
-        if(sum-color1 = 1 and sum-color2 = 1 and sum-color3 = 2 and sum-color4 = 1) ;ABCC0
-        [set c6 c6 + 1]
-      ]
-    ] ;End if, conditions to enter in 4-neighbourhood analysys
+     ] ;End if, conditions to enter in 4-neighbourhood analysys
 
         if repeticion = false
         [
@@ -335,7 +303,6 @@ repeat 1600 ;Stripe
    set tparty_1 count patches with [pcolor = 2]
    set tparty_2 count patches with [pcolor = 8]
    set tparty_3 count patches with [pcolor = white ]
-   set tparty_4 count patches with [pcolor = black]
    set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
 
      ;To stablish final proportion
@@ -371,7 +338,6 @@ to-report proportional
   if menorav = 8 and h > propiniab
    [report 2]
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW

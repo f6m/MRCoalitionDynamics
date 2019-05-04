@@ -2,7 +2,7 @@
 
 ;Global Variables
 globals[contadorAct contadorActNull i j tduni1 tduni2 tduni3 tduni4 blacks
-        N propini propfin propiniab propt0  personas Caux sum-color1 sum-color2
+  N propini propfin propiniab propt0  personas Caux sum-color1 sum-color2
         sum-color3 sum-color4 npixel z pc nlist nlist1
         t0party_1 t0party_2 t0party_3 t0party_4 t0party_5
         contempate-mr contempate-ab menorav mayorav
@@ -183,7 +183,7 @@ to inicio
 
 set pc 2 ;Select minor party color an inicial color from coalition
 ;A repetition or a cycle is a selection of totaladistribuir nodes with or without repetition, here, Redner use 600 as the maximum number of repetitions
-repeat 1600 ;Stripe
+repeat 1600 ;Stripe Tc
 [
    ;Condicion para terminar el la dinámica del modelo, escencialmente es que se llege al concenso o que se efectuen todos los 600 ciclos
   if (tparty_1 = nnodos) or (tparty_2 = nnodos) or (tparty_3 = nnodos) or (tparty_5 = nnodos) [stop]
@@ -346,11 +346,11 @@ end
 GRAPHICS-WINDOW
 231
 10
-739
-519
+437
+217
 -1
 -1
-0.5
+0.1
 1
 10
 1
