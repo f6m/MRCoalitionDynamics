@@ -154,7 +154,6 @@ set N nnodos
 
  ;Variables para contar cada actualización realizada
  set contadorAct 0 ;This counter register the number of updates
- set contadorActNull 0 ;This counter register the number of updates before null nodes dissapear
 
  ;To know minimum and maximum size party and to fix initial proportion.
  ;I = Im / Ig
@@ -309,7 +308,7 @@ repeat 1600 ;Stripe Tc
    set tparty_5 count patches with [pcolor = 8 or pcolor = 2]
 
      ;To stablish final proportion
-     if ((menorav = 2) and (tparty_2 != 0)) ;party A is the minimum size party
+    if ((menorav = 2) and (tparty_2 != 0)) ;party A is the minimum size party
      [
      set propfin tparty_1 / tparty_2
      ]
@@ -346,11 +345,11 @@ end
 GRAPHICS-WINDOW
 231
 10
-437
-217
+338
+118
 -1
 -1
-0.1
+0.01
 1
 10
 1
@@ -440,7 +439,7 @@ INPUTBOX
 445
 638
 tparty_1
-85000.0
+0.0
 1
 0
 Number
@@ -451,7 +450,7 @@ INPUTBOX
 612
 638
 tparty_2
-415000.0
+0.0
 1
 0
 Number
@@ -462,7 +461,7 @@ INPUTBOX
 779
 639
 tparty_3
-500000.0
+0.0
 1
 0
 Number
@@ -510,7 +509,7 @@ INPUTBOX
 613
 707
 tparty_5
-500000.0
+0.0
 1
 0
 Number
@@ -686,10 +685,10 @@ propini
 11
 
 MONITOR
-1188
-217
-1350
-262
+1187
+174
+1348
+219
 #MINOR fin / #MAYOR fin
 propfin
 17
@@ -801,17 +800,6 @@ MONITOR
 624
 #Empate AB
 contempate-ab
-17
-1
-11
-
-MONITOR
-1188
-173
-1349
-218
-# MINOR To / # MAYOR To
-propt0
 17
 1
 11
